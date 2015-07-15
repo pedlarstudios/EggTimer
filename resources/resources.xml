@@ -1,0 +1,4 @@
+<resources>
+    <string id="AppName">Timer</string>
+    <bitmap id="LauncherIcon" filename="images/egg-logo.png" />
+</resources>
