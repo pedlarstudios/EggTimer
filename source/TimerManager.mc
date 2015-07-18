@@ -17,9 +17,9 @@ class TimerManager {
 
 	//! Creates a TimerManager instance
 	//!
-	//! @param [Method] timerStartedCallback Method to call when timer starts
-	//! @param [Method] timerStoppedCallback Method to call when timer stops
-	//! @param [Method] timerFinishedCallback Method to call when timer finishes
+	//! @param [Method] timerStartedCallback Method to call when a timer starts
+	//! @param [Method] timerStoppedCallback Method to call when a timer stops
+	//! @param [Method] timerFinishedCallback Method to call when a timer finishes
 	function initialize(timerStartedCallback, timerStoppedCallback, timerFinishedCallback) {
 		self.timerStartedCallback = timerStartedCallback;
 		self.timerStoppedCallback = timerStoppedCallback;
@@ -45,20 +45,6 @@ class TimerManager {
 	//! @param [Duration] duration
 	function addNewTimer(duration) {
 		addTimerHidden(duration, new Time.Duration(0), true);
-	}
-	
-	hidden function addTimerHidden(duration, elapsedTime, startAutomatically) {
-		if (timerCount >= MAX_MANAGED_TIMER_COUNT) {
-			logger.error("Cannot add timer, max timer count of " + MAX_MANAGED_TIMER_COUNT + " would be exceeded");
-			return null;
-		}
-		
-		logger.debug("Adding timer with duration: " + duration.value() + "s, elapsed time: " + elapsedTime.value() + "s");		
-		var newTimer = new EggTimer(duration, elapsedTime, timerCount + 1, startAutomatically, timerFinishedCallback);
-		timers[timerCount] = newTimer;
-		timerCount++;
-		selectTimer(newTimer);
-		return newTimer;
 	}
 	
 	//! @return [Number] The number of timers
@@ -105,6 +91,20 @@ class TimerManager {
 		}
 	}
 	
+	hidden function addTimerHidden(duration, elapsedTime, startAutomatically) {
+		if (timerCount >= MAX_MANAGED_TIMER_COUNT) {
+			logger.error("Cannot add timer, max timer count of " + MAX_MANAGED_TIMER_COUNT + " would be exceeded");
+			return null;
+		}
+		
+		logger.debug("Adding timer with duration: " + duration.value() + "s, elapsed time: " + elapsedTime.value() + "s");		
+		var newTimer = new EggTimer(duration, elapsedTime, timerCount + 1, startAutomatically, timerFinishedCallback);
+		timers[timerCount] = newTimer;
+		timerCount++;
+		selectTimer(newTimer);
+		return newTimer;
+	}
+	
 	//! Simple class representing a timer
 	class EggTimer {		
 		hidden var backingTimer;
@@ -114,7 +114,7 @@ class TimerManager {
 		hidden var timeRemaining;
 		hidden var logger;
 		hidden var timerFinishedCallback;
-		hidden var _isRunning = false;	// Monkey C does not presently allow variable names and method names to be the same
+		hidden var _isRunning = false;	// Monkey C does not presently allow variable names and method names to be the same, hence the underscore
 	
 		//! Creates an EggTimer instance
 		//!
@@ -157,6 +157,10 @@ class TimerManager {
 				logger.warn("Start() called when timer is running. No-op");
 				return;
 			}
+			if (timeRemaining.value() <= 0) {
+				// No-op
+				return;
+			}
 			logger.info("Starting timer");
 			backingTimer.start(method(:updateInternalState), 1000, true); 
 			_isRunning = true;
@@ -166,6 +170,10 @@ class TimerManager {
 		hidden function stop() {
 			if (!isRunning()) {
 				logger.warn("Stop() called when timer is stopped. No-op");
+				return;
+			}
+			if (timeRemaining.value() <= 0) {
+				// No-op
 				return;
 			}
 			logger.info("Stopping timer");

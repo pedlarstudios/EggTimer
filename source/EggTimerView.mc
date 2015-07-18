@@ -11,9 +11,8 @@ class EggTimerView extends Ui.View {
 	hidden var propertyHandler;
 	hidden var masterClockTimerStarted = false;
 	hidden var separatorLabel;
-	hidden var timerHelpLabel;
 	hidden var logger;
-	hidden var timerDrawables = new [3];
+	hidden var timerDrawable;
 
 	//! Creates an EggTimerView
 	//!
@@ -30,8 +29,8 @@ class EggTimerView extends Ui.View {
 	
     //! Load your resources here
     function onLayout(dc) {
+    	logger.debug("On layout");
         setLayout(Rez.Layouts.MainLayout(dc));
-        self.timerHelpLabel = findDrawableById("timerHelp");
     }
 
     //! Called when this View is brought to the foreground. Restore
@@ -50,15 +49,17 @@ class EggTimerView extends Ui.View {
 
     //! Update the view
     function onUpdate(dc) {
-    	dc.clear();
         // Call the parent onUpdate function to redraw the layout
         View.onUpdate(dc);
+        if (manager.getTimerCount() > 0) {
+        	hideHelpText();
+        }
+        else {
+        	showHelpText();
+        }
         separatorLabel.draw(dc);
-        for (var i = 0; i < timerDrawables.size(); i++) {
-        	var timer = timerDrawables[i];
-        	if (timer != null) {
-        		timer.draw(dc);
-        	}
+        if (timerDrawable != null) {
+        	timerDrawable.draw(dc);
         }
     }
 
@@ -76,22 +77,19 @@ class EggTimerView extends Ui.View {
     
     hidden function updateTimersUi() {
      	if (manager.getTimerCount() > 0) {
-        	hideDrawable(timerHelpLabel);
-        	
         	// TODO - Eventually support multiple timers
         	var timer = manager.getSelectedTimer();
         	var timeRemainingText = getTimeRemainingFormatted(timer.getTimeRemaining().value());
-        		
-    		var timerLabel = new Ui.Text({
-            	:locX => 102,
-            	:locY => 90,
-            	:text => timeRemainingText,
-            	:color => Gfx.COLOR_WHITE,
-            	:font => Gfx.FONT_NUMBER_THAI_HOT,
-            	:justification => Gfx.TEXT_JUSTIFY_CENTER | Gfx.TEXT_JUSTIFY_VCENTER
-        	});
         	
-    		timerDrawables[0] = timerLabel;
+        	if (timerDrawable == null) {
+	    		timerDrawable = buildTimerLabel(timeRemainingText);
+        	}
+        	else {
+        		timerDrawable.setText(timeRemainingText);
+        	}
+    	}
+    	else {
+    		timerDrawable = null;
     	}
     }
     
@@ -119,7 +117,7 @@ class EggTimerView extends Ui.View {
 	
 	hidden function getTimeRemainingFormatted(timeRemainingSeconds) {
 		var timeRemainingText;
-		// Hours
+		// Time Remaining in Hours
 		if (timeRemainingSeconds >= Cal.SECONDS_PER_HOUR) {
 			var hours = (timeRemainingSeconds / Cal.SECONDS_PER_HOUR).toNumber();
 			var minutes = (timeRemainingSeconds % Cal.SECONDS_PER_HOUR / Cal.SECONDS_PER_MINUTE).toNumber();
@@ -127,7 +125,7 @@ class EggTimerView extends Ui.View {
 			
 			timeRemainingText = hours.format("%01d") + ":" + minutes.format("%02d") + ":" + seconds.format("%02d");
 		}
-		// Minutes
+		// Time Remaining in Minutes or Seconds
 		else {
 			var minutes = (timeRemainingSeconds / Cal.SECONDS_PER_MINUTE).toNumber();
 			var seconds = timeRemainingSeconds % Cal.SECONDS_PER_MINUTE;
@@ -138,9 +136,22 @@ class EggTimerView extends Ui.View {
 		return timeRemainingText;
 	}
 	
-	//! Temporary hack
-	hidden function hideDrawable(drawable) {
-		drawable.setLocation(-1000, -1000);
+	hidden function buildTimerLabel(text) {
+		return new Ui.Text({
+        	:locX => 102,
+        	:locY => 90,
+        	:text => text,
+        	:color => Gfx.COLOR_WHITE,
+        	:font => Gfx.FONT_NUMBER_THAI_HOT,
+        	:justification => Gfx.TEXT_JUSTIFY_CENTER | Gfx.TEXT_JUSTIFY_VCENTER
+    	});
 	}
 
+	hidden function hideHelpText() {
+		findDrawableById("timerHelp").setText("");
+	}
+	
+	hidden function showHelpText() {
+		findDrawableById("timerHelp").setText(Ui.loadResource(Rez.Strings.HelpLabelText));
+	}
 }

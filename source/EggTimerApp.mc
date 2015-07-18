@@ -40,6 +40,7 @@ class EggTimerApp extends App.AppBase {
 			Attn.vibrate([ new Attn.VibeProfile(5, 250) ]);
 		}
 		
+		// Not actually applicable on Vivoactive, just adding in case of additional device support
 		if (Sys.getDeviceSettings().tonesOn) {
 			Attn.playTone(Attn.TONE_START);
 		}		
@@ -53,6 +54,7 @@ class EggTimerApp extends App.AppBase {
 			Attn.vibrate([ new Attn.VibeProfile(5, 500) ]);
 		}
 		
+		// Not actually applicable on Vivoactive, just adding in case of additional device support
 		if (Sys.getDeviceSettings().tonesOn) {
 			Attn.playTone(Attn.TONE_STOP);
 		}
@@ -103,7 +105,6 @@ class EggTimerDelegate extends Ui.BehaviorDelegate {
 			view.requestUpdate();	
 		}
 		else if (Ui.KEY_ESC == evt.getKey()) {
-			// Save current timer preferences
 			propertyHandler.storeTimers(manager);
 			// Exit application
 			Ui.popView(Ui.SLIDE_IMMEDIATE);
@@ -112,32 +113,56 @@ class EggTimerDelegate extends Ui.BehaviorDelegate {
 		return true;
 	}
 	
-	//! Handle user screen holds
-	//!
-	//! @param evt
-    function onHold(evt) {
+	//! Specifically handles the menu key press
+    function onMenu() {
     	if (manager.getTimerCount() > 0) {
-    		// TODO - Confirmation
-    		manager.clearSelectedTimer();
-    		showTimerDurationPicker();
-    		Ui.requestUpdate();
+			var confirmation = new Ui.Confirmation("Clear current timer?");
+			Ui.pushView(confirmation, new ConfirmationDelegateWithCallback(method(:clearSelectedTimer)), Ui.SLIDE_DOWN);
+			view.requestUpdate();
     	}
 		else if (manager.canAddTimer()) {
 			showTimerDurationPicker();
-    		Ui.requestUpdate();
+    		view.requestUpdate();
     	}
         return true;
+	}
+	
+	//! Clear the selected timer and show the timer duration picker
+	function clearSelectedTimer() {
+		manager.clearSelectedTimer();
+		view.requestUpdate();
+		showTimerDurationPicker();
 	}
 	
 	hidden function showTimerDurationPicker() {
 		var defaultDuration = propertyHandler.getLastTimerDuration();
 		Ui.pushView(new Ui.NumberPicker(Ui.NUMBER_PICKER_TIME, defaultDuration), new NewTimerPickerDelegate(manager, propertyHandler), Ui.SLIDE_UP);
-		Ui.requestUpdate();
+		view.requestUpdate();
 	}
 }
 
-class ResetTimerConfirmationDelegate extends Ui.ConfirmationDelegate {
-	// TODO - Use to force confirmation when resetting timer
+//! ConfirmationDelegate that invokes a callback method when the response is Yes
+class ConfirmationDelegateWithCallback extends Ui.ConfirmationDelegate {
+	hidden var callbackMethod;
+
+	//! Creates a ConfirmationDelegateWithCallback
+	//!
+	//! @param [Method] callbackMethod to invoke if Yes is the response
+	function initialize(callbackMethod) {
+		self.callbackMethod = callbackMethod;
+	}
+	
+	//! When a response is chosen, onResponse() is called, passing the response of CONFIRM_NO or CONFIRM_YES.
+	//!
+	//! @param [Object] response
+	function onResponse(response) {
+		if (response == Ui.CONFIRM_YES) {
+			callbackMethod.invoke();
+		}
+		
+		Ui.requestUpdate();
+		return true;
+	}
 }
 
 //! NumberPickerDelegate used when adding a timer
