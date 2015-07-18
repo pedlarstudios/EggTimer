@@ -41,7 +41,7 @@ class EggTimerView extends Ui.View {
     	updateClockTimeUi();
     	if (!masterClockTimerStarted) {
     		propertyHandler.loadPreviousTimers(manager);
-    		masterClockTimer.start(method(:updateOnTimer), 1000, true);
+    		masterClockTimer.start(method(:updateOnTimer), 100, true);
     		masterClockTimerStarted = true;
     	}
     	return true;    	
@@ -79,7 +79,7 @@ class EggTimerView extends Ui.View {
      	if (manager.getTimerCount() > 0) {
         	// TODO - Eventually support multiple timers
         	var timer = manager.getSelectedTimer();
-        	var timeRemainingText = getTimeRemainingFormatted(timer.getTimeRemaining().value());
+        	var timeRemainingText = getTimeRemainingFormatted(timer.getTimeRemaining() / 1000);
         	
         	if (timerDrawable == null) {
 	    		timerDrawable = buildTimerLabel(timeRemainingText);

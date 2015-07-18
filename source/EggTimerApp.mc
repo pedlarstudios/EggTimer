@@ -41,7 +41,7 @@ class EggTimerApp extends App.AppBase {
 		}
 		
 		// Not actually applicable on Vivoactive, just adding in case of additional device support
-		if (Sys.getDeviceSettings().tonesOn) {
+		if (Attn has :playTone && Sys.getDeviceSettings().tonesOn) {
 			Attn.playTone(Attn.TONE_START);
 		}		
     }
@@ -55,7 +55,7 @@ class EggTimerApp extends App.AppBase {
 		}
 		
 		// Not actually applicable on Vivoactive, just adding in case of additional device support
-		if (Sys.getDeviceSettings().tonesOn) {
+		if (Attn has :playTone && Sys.getDeviceSettings().tonesOn) {
 			Attn.playTone(Attn.TONE_STOP);
 		}
     }
@@ -68,7 +68,7 @@ class EggTimerApp extends App.AppBase {
 			Attn.vibrate([ new Attn.VibeProfile(5, 1000), new Attn.VibeProfile(5, 1000), new Attn.VibeProfile(5, 1000), new Attn.VibeProfile(5, 1000), new Attn.VibeProfile(5, 1000) ]);
 		}
 		
-		if (Sys.getDeviceSettings().tonesOn) {
+		if (Attn has :playTone && Sys.getDeviceSettings().tonesOn) {
 			Attn.playTone(Attn.TONE_ALARM);
 		}
     }
@@ -183,7 +183,7 @@ class NewTimerPickerDelegate extends Ui.NumberPickerDelegate {
 	//! 
 	//! @param [Duration] value picked
 	function onNumberPicked(value) {
-		manager.addNewTimer(value);
+		manager.addNewTimer(value.value() * 1000);
 		propertyHandler.setLastTimerDuration(value);
 	}
 }

@@ -51,7 +51,7 @@ class PropertyHandler {
 				if (timeElapsed == null) {
 					timeElapsed = 0;
 				}
-				timerManager.addTimer(new Time.Duration(duration), new Time.Duration(timeElapsed));
+				timerManager.addTimer(duration, timeElapsed);
 			} 
 		}
 		else {
@@ -72,10 +72,10 @@ class PropertyHandler {
 		for (var i = 0; i < timerCount; i++) {
 			var timer = timerManager.getTimers()[i];
 			logger.debug("--Saving timer " + i);
-			logger.debug("----Elapsed: " + timer.getTimeElapsed().value());
-			logger.debug("----Duration: " + timer.getDuration().value());
-			app.setProperty(TIMER_ELAPSED_TIME_KEY + i.toString(), timer.getTimeElapsed().value());
-			app.setProperty(TIMER_DURATION_KEY + i.toString(), timer.getDuration().value());
+			logger.debug("----Elapsed: " + timer.getTimeElapsed() + "ms");
+			logger.debug("----Duration: " + timer.getDuration() + "ms");
+			app.setProperty(TIMER_ELAPSED_TIME_KEY + i.toString(), timer.getTimeElapsed());
+			app.setProperty(TIMER_DURATION_KEY + i.toString(), timer.getDuration());
 		}	
 	}
 

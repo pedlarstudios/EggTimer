@@ -34,24 +34,23 @@ class TimerManager {
 
 	//! Add a timer, selecting it in the process. This timer begins in a stopped state
 	//!
-	//! @param [Duration] duration
-	//! @param [Duration] elapsedTime
+	//! @param [Number] duration, in ms
+	//! @param [Number] elapsedTime, in ms
 	function addTimer(duration, elapsedTime) {
 		addTimerHidden(duration, elapsedTime, false);
 	}
 	
 	//! Add a new timer, selecting it in the process, and starting it automatically
 	//!
-	//! @param [Duration] duration
+	//! @param [Number] duration, in ms
 	function addNewTimer(duration) {
-		addTimerHidden(duration, new Time.Duration(0), true);
+		addTimerHidden(duration, 0, true);
 	}
 	
 	//! @return [Number] The number of timers
 	function getTimerCount() {
 		return timerCount;
 	}
-	
 	    
     //! @return [Array] of [EggTimer]s, of size MAX_MANAGED_TIMER_COUNT (may have null items)
     function getTimers() {
@@ -65,6 +64,9 @@ class TimerManager {
 	
 	//! Clear the selected timer
 	function clearSelectedTimer() {
+		if (selectedTimer != null) {
+			selectedTimer.stop();
+		}
 		selectedTimer = null;
 		// TODO - Truly handle multiple timers
 		timers = new [ MAX_MANAGED_TIMER_COUNT ];
@@ -78,9 +80,13 @@ class TimerManager {
 		selectedTimer = timer;
 	}
 	
-	//! Start or stop the selected timer, if one is present
+	//! Start or stop the selected timer, if one is present, and not finished
 	function startOrStopSelectedTimer() {
 		if (selectedTimer != null) {
+			if (selectedTimer.isFinished()) {
+				return;
+			}
+			
 			selectedTimer.startOrStop();
 			if (selectedTimer.isRunning()) {
 				timerStartedCallback.invoke(selectedTimer);
@@ -97,7 +103,7 @@ class TimerManager {
 			return null;
 		}
 		
-		logger.debug("Adding timer with duration: " + duration.value() + "s, elapsed time: " + elapsedTime.value() + "s");		
+		logger.debug("Adding timer with duration: " + duration + "ms, elapsed time: " + elapsedTime + "ms");		
 		var newTimer = new EggTimer(duration, elapsedTime, timerCount + 1, startAutomatically, timerFinishedCallback);
 		timers[timerCount] = newTimer;
 		timerCount++;
@@ -107,6 +113,8 @@ class TimerManager {
 	
 	//! Simple class representing a timer
 	class EggTimer {		
+		hidden const TIMER_INCREMENT = 100;	// ms
+	
 		hidden var backingTimer;
 		hidden var duration;
 		hidden var timeElapsed;
@@ -115,11 +123,12 @@ class TimerManager {
 		hidden var logger;
 		hidden var timerFinishedCallback;
 		hidden var _isRunning = false;	// Monkey C does not presently allow variable names and method names to be the same, hence the underscore
+		hidden var _isFinished = false;
 	
 		//! Creates an EggTimer instance
 		//!
-		//! @param [Duration] duration Duration of the timer
-		//!	@param [Duration] timeElapsed Time elapsed (if this was an existing timer) 
+		//! @param [Number] duration Duration of the timer, in ms
+		//!	@param [Number] timeElapsed Time elapsed, in ms 
 		//! @param [String] label describing the timer
 		//! @param [Boolean] true if the timer should start counting down automatically after initialized
 		//! @param [Method] timerFinishedCallback Method to call when the timer finishes (time remaining = 0)
@@ -129,7 +138,7 @@ class TimerManager {
 			self.label = label;
 			self.timerFinishedCallback = timerFinishedCallback;
 			
-			timeRemaining = duration.subtract(timeElapsed);
+			timeRemaining = duration - timeElapsed;
 			backingTimer = new Timer.Timer();
 			logger = Log.getLogger("Timer " + label);
 			
@@ -141,6 +150,11 @@ class TimerManager {
 		//! @return [Boolean] True if the timer is currently running
 		function isRunning() {
 			return _isRunning;	
+		}
+		
+		//! @return [Boolean] True if the timer is currently finished (time remaining = 0)
+		function isFinished() {
+			return _isFinished;
 		}		
 		
 		//! Stop the timer if it's running, start it if it's not
@@ -152,46 +166,40 @@ class TimerManager {
 		}
 		
 		//! Start the timer
-		hidden function start() {
+		function start() {
 			if (isRunning()) {
 				logger.warn("Start() called when timer is running. No-op");
 				return;
 			}
-			if (timeRemaining.value() <= 0) {
-				// No-op
-				return;
-			}
+			
 			logger.info("Starting timer");
-			backingTimer.start(method(:updateInternalState), 1000, true); 
+			backingTimer.start(method(:updateInternalState), TIMER_INCREMENT, true); 
 			_isRunning = true;
 		}
 		
 		//! Stop the timer
-		hidden function stop() {
+		function stop() {
 			if (!isRunning()) {
 				logger.warn("Stop() called when timer is stopped. No-op");
 				return;
 			}
-			if (timeRemaining.value() <= 0) {
-				// No-op
-				return;
-			}
+
 			logger.info("Stopping timer");
 			backingTimer.stop();
 			_isRunning = false;
 		}
 		
-		//! @return [Duration] Time remaining
+		//! @return [Number] Time remaining, in ms
 		function getTimeRemaining() {
 			return timeRemaining;
 		}
 		
-		//! @return [Duration] Time elapsed
+		//! @return [Number] Time elapsed, in ms
 		function getTimeElapsed() {
 			return timeElapsed;
 		}
 		
-		//! @return [Duration] Timer duration
+		//! @return [Number] Timer duration, in ms
 		function getDuration() {
 			return duration;
 		}
@@ -200,15 +208,24 @@ class TimerManager {
 		//!
 		//! This function would ideally be hidden but that would prevent it from being used as a timer callback in Monkey C
 		function updateInternalState() {
-			timeElapsed = timeElapsed.add(new Time.Duration(1));
-			timeRemaining = timeRemaining.subtract(new Time.Duration(1));
-			
-			logger.info("Time elapsed: " + timeElapsed.value() + "s, Time remaining: " + timeRemaining.value() + "s");
-			
-			if (timeRemaining.value() <= 0) {
-				stop();				
-				timerFinishedCallback.invoke(self);
+			if (finishIfNecessary()) {
+				return;
 			}
+			timeElapsed += TIMER_INCREMENT;
+			timeRemaining -= TIMER_INCREMENT; 
+			
+			logger.info("Time elapsed: " + timeElapsed + "ms, Time remaining: " + timeRemaining + "ms");
+			finishIfNecessary();
+		}
+		
+		hidden function finishIfNecessary() {
+			if (timeRemaining <= 0 && !_isFinished) {
+				stop();				
+				_isFinished = true;
+				timerFinishedCallback.invoke(self);
+				return true;
+			}
+			return false;
 		}
 	}
 }
