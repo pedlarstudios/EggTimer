@@ -41,6 +41,7 @@ class PropertyHandler {
 		var app = App.getApp();
 		var timerCount = app.getProperty(TIMER_COUNT_KEY);
 		
+		timerManager.clearTimers();
 		if (timerCount != null) {
 			for (var i = 0; i < timerCount; i++) {
 				var duration = app.getProperty(TIMER_DURATION_KEY + i.toString());
@@ -51,6 +52,7 @@ class PropertyHandler {
 				if (timeElapsed == null) {
 					timeElapsed = 0;
 				}
+				logger.debug("Adding previous timer");
 				timerManager.addTimer(duration, timeElapsed);
 			} 
 		}

@@ -24,7 +24,7 @@ class TimerManager {
 		self.timerStartedCallback = timerStartedCallback;
 		self.timerStoppedCallback = timerStoppedCallback;
 		self.timerFinishedCallback = timerFinishedCallback;
-		logger = Log.getLogger("TimeManager");
+		logger = Log.getLogger("TimerManager");
 	}
 	
 	//! @return [Boolean] True if a timer can be added
@@ -67,8 +67,15 @@ class TimerManager {
 		if (selectedTimer != null) {
 			selectedTimer.stop();
 		}
+
+		// TODO - handle multiple timers
+		clearTimers();
+	}
+	
+	//! Clear managed timers
+	function clearTimers() {
+		// TODO - handle multiple timers
 		selectedTimer = null;
-		// TODO - Truly handle multiple timers
 		timers = new [ MAX_MANAGED_TIMER_COUNT ];
 		timerCount = 0;
 	}
@@ -123,7 +130,7 @@ class TimerManager {
 		hidden var logger;
 		hidden var timerFinishedCallback;
 		hidden var _isRunning = false;	// Monkey C does not presently allow variable names and method names to be the same, hence the underscore
-		hidden var _isFinished = false;
+		hidden var _isFinished;
 	
 		//! Creates an EggTimer instance
 		//!
@@ -139,6 +146,7 @@ class TimerManager {
 			self.timerFinishedCallback = timerFinishedCallback;
 			
 			timeRemaining = duration - timeElapsed;
+			_isFinished = timeRemaining <= 0;
 			backingTimer = new Timer.Timer();
 			logger = Log.getLogger("Timer " + label);
 			
@@ -168,7 +176,7 @@ class TimerManager {
 		//! Start the timer
 		function start() {
 			if (isRunning()) {
-				logger.warn("Start() called when timer is running. No-op");
+				logger.info("Start() called when timer is running. No-op");
 				return;
 			}
 			
@@ -180,7 +188,7 @@ class TimerManager {
 		//! Stop the timer
 		function stop() {
 			if (!isRunning()) {
-				logger.warn("Stop() called when timer is stopped. No-op");
+				logger.info("Stop() called when timer is stopped. No-op");
 				return;
 			}
 

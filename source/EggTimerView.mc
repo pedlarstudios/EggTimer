@@ -8,7 +8,6 @@ using Log4MonkeyC as Log;
 class EggTimerView extends Ui.View {
 	hidden var manager;
 	hidden var masterClockTimer;
-	hidden var propertyHandler;
 	hidden var masterClockTimerStarted = false;
 	hidden var separatorLabel;
 	hidden var logger;
@@ -17,20 +16,21 @@ class EggTimerView extends Ui.View {
 	//! Creates an EggTimerView
 	//!
 	//! @param [TimerManager] manager
-	//! @param [PropertyHandler] propertyHandler
 	//! @param [Timer] masterClockTimer
-	function initialize(manager, propertyHandler, masterClockTimer) {
+	function initialize(manager, masterClockTimer) {
 		self.manager = manager;
-		self.propertyHandler = propertyHandler;
 		self.masterClockTimer = masterClockTimer;
 		separatorLabel = new Rez.Drawables.clockSeparator();
 		logger = Log.getLogger("EggTimerView");
 	}
 	
-    //! Load your resources here
+    //! Load resources
+	//!
+	//! @param [Graphics.dc] dc
     function onLayout(dc) {
     	logger.debug("On layout");
         setLayout(Rez.Layouts.MainLayout(dc));
+        separatorLabel.draw(dc);
     }
 
     //! Called when this View is brought to the foreground. Restore
@@ -40,7 +40,6 @@ class EggTimerView extends Ui.View {
     	logger.debug("On show");
     	updateClockTimeUi();
     	if (!masterClockTimerStarted) {
-    		propertyHandler.loadPreviousTimers(manager);
     		masterClockTimer.start(method(:updateOnTimer), 100, true);
     		masterClockTimerStarted = true;
     	}
@@ -48,6 +47,8 @@ class EggTimerView extends Ui.View {
     }
 
     //! Update the view
+	//!
+	//! @param [Graphics.dc] dc
     function onUpdate(dc) {
         // Call the parent onUpdate function to redraw the layout
         View.onUpdate(dc);
@@ -68,11 +69,17 @@ class EggTimerView extends Ui.View {
     //! memory.
     function onHide() {
 		logger.debug("On hide");
+		masterClockTimerStarted = false;
+		masterClockTimer.stop();
     }
     
+    //! Callback function for view timer
+	//!
+	//! This function would ideally be hidden but that would prevent it from being used as a timer callback in Monkey C
     function updateOnTimer() {
 		updateTimersUi();     	
     	updateClockTimeUi();
+   		Ui.requestUpdate();
     }
     
     hidden function updateTimersUi() {
@@ -110,9 +117,7 @@ class EggTimerView extends Ui.View {
     	if (!is24HourTime) {
     		timeText += clockTime.hour < 12 ? " AM" : " PM"; 
     	}
-    	currentTimeLabel.setText(timeText);
-    	
-    	Ui.requestUpdate();
+    	currentTimeLabel.setText(timeText);    	
 	}
 	
 	hidden function getTimeRemainingFormatted(timeRemainingSeconds) {

@@ -1,5 +1,6 @@
 <resources>
     <string id="AppName">Timer</string>
     <bitmap id="LauncherIcon" filename="images/egg-logo.png" />
-    <string id="HelpLabelText">Press Menu button\r\n to set timer or\r\n clear running timer</string>
+    <string id="HelpLabelText">Press Menu button\r\n to start new timer</string>
+    <string id="ClearTimerText">Start new timer?</string>
 </resources>

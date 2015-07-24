@@ -5,7 +5,7 @@ using Toybox.System as Sys;
 using Toybox.WatchUi as Ui;
 using Log4MonkeyC as Log;
 
-//! Main application. Creates the initial view and provides some high-level callback methods
+//! Main application. Creates the initial view and provides some high-level callback methods related to user attention
 class EggTimerApp extends App.AppBase {
 	// Using global clock timer to get around Connect IQ issue where "too many timers" exception may be raised incorrectly
 	hidden var masterClockTimer;
@@ -14,7 +14,7 @@ class EggTimerApp extends App.AppBase {
     function onStart() {
     	// SET APPROPRIATELY BEFORE DEPLOYMENT/RELEASE
 		var config = new Log4MonkeyC.Config();
-		config.setLogLevel(Log.DEBUG);
+		config.setLogLevel(Log.WARN);
 		Log4MonkeyC.setLogConfig(config);
 		masterClockTimer = new Timer.Timer();
     }
@@ -27,9 +27,10 @@ class EggTimerApp extends App.AppBase {
     //! Return the initial view of your application here
     function getInitialView() {
     	var manager = new TimerManager(method(:timerStarted), method(:timerStopped), method(:timerFinished));
+    	var view = new EggTimerView(manager, masterClockTimer);
     	var propertyHandler = new PropertyHandler();
-    	var view = new EggTimerView(manager, propertyHandler, masterClockTimer);
-        return [ view, new EggTimerDelegate(manager, view, propertyHandler, masterClockTimer) ];
+    	propertyHandler.loadPreviousTimers(manager);
+        return [ view, new EggTimerDelegate(manager, propertyHandler, masterClockTimer) ];
     }
     
     //! Handle when a timer is started in the application
@@ -77,7 +78,6 @@ class EggTimerApp extends App.AppBase {
 //! Handles user interaction with the timers 
 class EggTimerDelegate extends Ui.BehaviorDelegate {
 	hidden var manager;
-	hidden var view;
 	hidden var propertyHandler;
 	hidden var masterClockTimer;
 	hidden var logger;
@@ -85,12 +85,10 @@ class EggTimerDelegate extends Ui.BehaviorDelegate {
 	//! Creates a delegate instance
 	//!
 	//! @param [TimerManager] manager
-	//! @param [View] view Main view
 	//! @param [PropertyHandler] propertyHandler
 	//! @param [Timer] masterClockTimer
-	function initialize(manager, view, propertyHandler, masterClockTimer) {
+	function initialize(manager, propertyHandler, masterClockTimer) {
 		self.manager = manager;
-		self.view = view;
 		self.propertyHandler = propertyHandler;
 		self.masterClockTimer = masterClockTimer;
 		logger = Log.getLogger("EggTimerDelegate");
@@ -102,7 +100,6 @@ class EggTimerDelegate extends Ui.BehaviorDelegate {
 	function onKey(evt) {
 		if (Ui.KEY_ENTER == evt.getKey()) {			
 			manager.startOrStopSelectedTimer();
-			view.requestUpdate();	
 		}
 		else if (Ui.KEY_ESC == evt.getKey()) {
 			propertyHandler.storeTimers(manager);
@@ -116,13 +113,11 @@ class EggTimerDelegate extends Ui.BehaviorDelegate {
 	//! Specifically handles the menu key press
     function onMenu() {
     	if (manager.getTimerCount() > 0) {
-			var confirmation = new Ui.Confirmation("Clear current timer?");
-			Ui.pushView(confirmation, new ConfirmationDelegateWithCallback(method(:clearSelectedTimer)), Ui.SLIDE_DOWN);
-			view.requestUpdate();
+			var confirmation = new Ui.Confirmation(Ui.loadResource(Rez.Strings.ClearTimerText));
+			Ui.pushView(confirmation, new ConfirmationDelegateWithCallback(method(:clearSelectedTimer)), Ui.SLIDE_IMMEDIATE);
     	}
-		else if (manager.canAddTimer()) {
+		else if (manager.canAddTimer()) {			
 			showTimerDurationPicker();
-    		view.requestUpdate();
     	}
         return true;
 	}
@@ -130,14 +125,12 @@ class EggTimerDelegate extends Ui.BehaviorDelegate {
 	//! Clear the selected timer and show the timer duration picker
 	function clearSelectedTimer() {
 		manager.clearSelectedTimer();
-		view.requestUpdate();
 		showTimerDurationPicker();
 	}
 	
 	hidden function showTimerDurationPicker() {
 		var defaultDuration = propertyHandler.getLastTimerDuration();
-		Ui.pushView(new Ui.NumberPicker(Ui.NUMBER_PICKER_TIME, defaultDuration), new NewTimerPickerDelegate(manager, propertyHandler), Ui.SLIDE_UP);
-		view.requestUpdate();
+		Ui.pushView(new Ui.NumberPicker(Ui.NUMBER_PICKER_TIME, defaultDuration), new NewTimerPickerDelegate(manager, propertyHandler), Ui.SLIDE_IMMEDIATE);
 	}
 }
 
@@ -160,7 +153,6 @@ class ConfirmationDelegateWithCallback extends Ui.ConfirmationDelegate {
 			callbackMethod.invoke();
 		}
 		
-		Ui.requestUpdate();
 		return true;
 	}
 }
