@@ -10,6 +10,9 @@ class EggTimerView extends Ui.View {
 	hidden var masterClockTimer;
 	hidden var masterClockTimerStarted = false;
 	hidden var separatorLabel;
+	hidden var playIcon;
+	hidden var pauseIcon;
+	hidden var stopIcon;
 	hidden var logger;
 	hidden var timerDrawable;
 
@@ -21,6 +24,9 @@ class EggTimerView extends Ui.View {
 		self.manager = manager;
 		self.masterClockTimer = masterClockTimer;
 		separatorLabel = new Rez.Drawables.clockSeparator();
+		playIcon = Ui.loadResource(Rez.Drawables.PlayIcon);
+		pauseIcon = Ui.loadResource(Rez.Drawables.PauseIcon);
+		stopIcon = Ui.loadResource(Rez.Drawables.StopIcon);
 		logger = Log.getLogger("EggTimerView");
 	}
 	
@@ -30,7 +36,7 @@ class EggTimerView extends Ui.View {
     function onLayout(dc) {
     	logger.debug("On layout");
         setLayout(Rez.Layouts.MainLayout(dc));
-        separatorLabel.draw(dc);
+        separatorLabel.draw(dc);        
     }
 
     //! Called when this View is brought to the foreground. Restore
@@ -62,6 +68,8 @@ class EggTimerView extends Ui.View {
         if (timerDrawable != null) {
         	timerDrawable.draw(dc);
         }
+        
+        updateTimerStatusIcon(dc); 
     }
 
     //! Called when this View is removed from the screen. Save the
@@ -158,5 +166,26 @@ class EggTimerView extends Ui.View {
 	
 	hidden function showHelpText() {
 		findDrawableById("timerHelp").setText(Ui.loadResource(Rez.Strings.HelpLabelText));
+	}
+	
+	hidden function updateTimerStatusIcon(dc) {
+		if (manager.getTimerCount() > 0) {
+			var selectedTimer = manager.getSelectedTimer();
+			var icon;
+			if (selectedTimer.isFinished()) {
+				icon = stopIcon;
+			}
+			else if (selectedTimer.isRunning()) {
+				icon = playIcon;
+			}
+			else {
+				icon = pauseIcon;
+			}
+			
+			dc.drawBitmap(185, 9, icon);
+		}
+		else {
+			// No icon
+		}
 	}
 }
