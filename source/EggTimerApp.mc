@@ -7,6 +7,7 @@ using Log4MonkeyC as Log;
 
 //! Main application. Creates the initial view and provides some high-level callback methods related to user attention
 class EggTimerApp extends App.AppBase {
+	hidden const VIBRATE_DUTY_CYCLE = 100; // Max vibration frequency/strength
 	// Using global clock timer to get around Connect IQ issue where "too many timers" exception may be raised incorrectly
 	hidden var masterClockTimer;
 
@@ -38,7 +39,7 @@ class EggTimerApp extends App.AppBase {
 	//! @param [EggTimer] timer that started
     function timerStarted(timer) {
    		if (Sys.getDeviceSettings().vibrateOn) {			
-			Attn.vibrate([ new Attn.VibeProfile(5, 250) ]);
+			Attn.vibrate([ new Attn.VibeProfile(VIBRATE_DUTY_CYCLE, 250) ]);
 		}
 		
 		// Not actually applicable on Vivoactive, just adding in case of additional device support
@@ -52,7 +53,7 @@ class EggTimerApp extends App.AppBase {
 	//! @param [EggTimer] timer that stopped
     function timerStopped(timer) {
     	if (Sys.getDeviceSettings().vibrateOn) {			
-			Attn.vibrate([ new Attn.VibeProfile(5, 500) ]);
+			Attn.vibrate([ new Attn.VibeProfile(VIBRATE_DUTY_CYCLE, 500) ]);
 		}
 		
 		// Not actually applicable on Vivoactive, just adding in case of additional device support
@@ -66,7 +67,7 @@ class EggTimerApp extends App.AppBase {
 	//! @param [EggTimer] timer that finished
     function timerFinished(timer) {
     	if (Sys.getDeviceSettings().vibrateOn) {			
-			Attn.vibrate([ new Attn.VibeProfile(5, 1000), new Attn.VibeProfile(5, 1000), new Attn.VibeProfile(5, 1000), new Attn.VibeProfile(5, 1000), new Attn.VibeProfile(5, 1000) ]);
+			Attn.vibrate([ new Attn.VibeProfile(VIBRATE_DUTY_CYCLE, 1000), new Attn.VibeProfile(VIBRATE_DUTY_CYCLE, 1000), new Attn.VibeProfile(VIBRATE_DUTY_CYCLE, 1000), new Attn.VibeProfile(VIBRATE_DUTY_CYCLE, 1000), new Attn.VibeProfile(VIBRATE_DUTY_CYCLE, 1000) ]);
 		}
 		
 		if (Attn has :playTone && Sys.getDeviceSettings().tonesOn) {
