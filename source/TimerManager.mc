@@ -120,7 +120,7 @@ class TimerManager {
 	
 	//! Simple class representing a timer
 	class EggTimer {		
-		hidden const TIMER_INCREMENT = 100;	// ms
+		hidden const TIMER_INCREMENT = 250;	// ms
 	
 		hidden var backingTimer;
 		hidden var duration;

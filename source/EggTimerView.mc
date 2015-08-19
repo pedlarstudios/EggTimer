@@ -6,6 +6,8 @@ using Log4MonkeyC as Log;
 
 //! Main timer UI view
 class EggTimerView extends Ui.View {
+	hidden const MASTER_TIMER_INCREMENT = 250;	// ms
+
 	hidden var manager;
 	hidden var masterClockTimer;
 	hidden var masterClockTimerStarted = false;
@@ -46,7 +48,7 @@ class EggTimerView extends Ui.View {
     	logger.debug("On show");
     	updateClockTimeUi();
     	if (!masterClockTimerStarted) {
-    		masterClockTimer.start(method(:updateOnTimer), 100, true);
+    		masterClockTimer.start(method(:updateOnTimer), MASTER_TIMER_INCREMENT, true);
     		masterClockTimerStarted = true;
     	}
     	return true;    	
