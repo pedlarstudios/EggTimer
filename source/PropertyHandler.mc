@@ -49,7 +49,7 @@ class PropertyHandler {
 					duration = 0;
 				}
 				var timeElapsed = app.getProperty(TIMER_ELAPSED_TIME_KEY + i.toString());
-				if (timeElapsed == null) {
+				if (timeElapsed == null || timeElapsed == duration) {	// If timer was finished, reset it
 					timeElapsed = 0;
 				}
 				logger.debug("Adding previous timer");

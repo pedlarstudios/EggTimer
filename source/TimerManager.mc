@@ -90,12 +90,7 @@ class TimerManager {
 	//! Start or stop the selected timer, if one is present, and not finished
 	function startOrStopSelectedTimer() {
 		if (selectedTimer != null) {
-			if (selectedTimer.isFinished()) {
-				return;
-			}
-			
-			selectedTimer.startOrStop();
-			if (selectedTimer.isRunning()) {
+			if (selectedTimer.startOrStop()) {
 				timerStartedCallback.invoke(selectedTimer);
 			}
 			else {
@@ -130,7 +125,7 @@ class TimerManager {
 		hidden var logger;
 		hidden var timerFinishedCallback;
 		hidden var _isRunning = false;	// Monkey C does not presently allow variable names and method names to be the same, hence the underscore
-		hidden var _isFinished;
+		hidden var _isFinished;				
 	
 		//! Creates an EggTimer instance
 		//!
@@ -166,20 +161,20 @@ class TimerManager {
 		}		
 		
 		//! Stop the timer if it's running, start it if it's not
+		//!
+		//! @return [Boolean] True if the timer is running
 		function startOrStop() {
 			if (isRunning()) {
 				return stop();
+			}			
+			if (isFinished()) {
+				prepareForRestart();
 			}
-			return start();
+			return start();			
 		}
 		
 		//! Start the timer
-		function start() {
-			if (isRunning()) {
-				logger.info("Start() called when timer is running. No-op");
-				return;
-			}
-			
+		hidden function start() {			
 			logger.info("Starting timer");
 			backingTimer.start(method(:updateInternalState), TIMER_INCREMENT, true); 
 			_isRunning = true;
@@ -187,11 +182,6 @@ class TimerManager {
 		
 		//! Stop the timer
 		function stop() {
-			if (!isRunning()) {
-				logger.info("Stop() called when timer is stopped. No-op");
-				return;
-			}
-
 			logger.info("Stopping timer");
 			backingTimer.stop();
 			_isRunning = false;
@@ -234,6 +224,12 @@ class TimerManager {
 				return true;
 			}
 			return false;
+		}
+		
+		hidden function prepareForRestart() {
+			timeElapsed = 0;
+			timeRemaining = duration - timeElapsed;
+			_isFinished = false;			
 		}
 	}
 }
