@@ -75,7 +75,7 @@ class PropertyHandler {
 					}
 				}
 				logger.debug("Loading previous timer");
-				timerManager.addExistingTimer(duration, timeElapsed, continueTimer);
+				timerManager.addExistingTimer(duration, timeElapsed, continueTimer && timerWasRunning);
 			} 
 		}
 		else {
