@@ -10,6 +10,11 @@ class EggTimerApp extends App.AppBase {
 	hidden const VIBRATE_DUTY_CYCLE = 100; // Max vibration frequency/strength
 	// Using global clock timer to get around Connect IQ issue where "too many timers" exception may be raised incorrectly
 	hidden var masterClockTimer;
+	
+	//! Init the app
+	function initialize() {
+		App.AppBase.initialize();
+	}
 
     //! onStart() is called on application start up
     function onStart() {
@@ -89,6 +94,7 @@ class EggTimerDelegate extends Ui.BehaviorDelegate {
 	//! @param [PropertyHandler] propertyHandler
 	//! @param [Timer] masterClockTimer
 	function initialize(manager, propertyHandler, masterClockTimer) {
+		Ui.BehaviorDelegate.initialize();
 		self.manager = manager;
 		self.propertyHandler = propertyHandler;
 		self.masterClockTimer = masterClockTimer;
@@ -143,6 +149,7 @@ class ConfirmationDelegateWithCallback extends Ui.ConfirmationDelegate {
 	//!
 	//! @param [Method] callbackMethod to invoke if Yes is the response
 	function initialize(callbackMethod) {
+		Ui.ConfirmationDelegate.initialize();
 		self.callbackMethod = callbackMethod;
 	}
 	
@@ -168,6 +175,7 @@ class NewTimerPickerDelegate extends Ui.NumberPickerDelegate {
 	//! @param [TimerManager] manager
 	//! @param [PropertyHandler] propertyHandler
 	function initialize(manager, propertyHandler) {
+		Ui.NumberPickerDelegate.initialize();
 		self.manager = manager;
 		self.propertyHandler = propertyHandler;
 	}

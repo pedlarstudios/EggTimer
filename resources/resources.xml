@@ -6,4 +6,5 @@
     <string id="AppName">Timer</string>
     <string id="HelpLabelText">Press Menu button\r\n to start new timer</string>
     <string id="ClearTimerText">Start new timer?</string>
+    <string id="DefaultCurrentTimeLabel">--:--</string>
 </resources>

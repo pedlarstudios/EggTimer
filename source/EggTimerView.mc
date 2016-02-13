@@ -23,6 +23,7 @@ class EggTimerView extends Ui.View {
 	//! @param [TimerManager] manager
 	//! @param [Timer] masterClockTimer
 	function initialize(manager, masterClockTimer) {
+		Ui.View.initialize();
 		self.manager = manager;
 		self.masterClockTimer = masterClockTimer;
 		separatorLabel = new Rez.Drawables.clockSeparator();

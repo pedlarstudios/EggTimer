@@ -36,8 +36,17 @@ class TimerManager {
 	//!
 	//! @param [Number] duration, in ms
 	//! @param [Number] elapsedTime, in ms
-	function addTimer(duration, elapsedTime) {
+	function addExistingTimerStopped(duration, elapsedTime) {
 		addTimerHidden(duration, elapsedTime, false);
+	}
+	
+	//! Add a timer, selecting it in the process
+	//!
+	//! @param [Number] duration, in ms
+	//! @param [Number] elapsedTime, in ms
+	//! @param [Boolean] startAutomatically if true, else begin in a stopped state
+	function addExistingTimer(duration, elapsedTime, startAutomatically) {
+		addTimerHidden(duration, elapsedTime, startAutomatically);
 	}
 	
 	//! Add a new timer, selecting it in the process, and starting it automatically
@@ -217,7 +226,7 @@ class TimerManager {
 		}
 		
 		hidden function finishIfNecessary() {
-			if (timeRemaining <= 0 && !_isFinished) {
+			if (timeRemaining <= 0) {
 				stop();				
 				_isFinished = true;
 				timerFinishedCallback.invoke(self);

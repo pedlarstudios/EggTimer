@@ -1,0 +1,15 @@
+<resources>
+    <properties>
+        <property id="timerContinuesOnAppClose" type="boolean">false</property>
+    </properties>
+
+    <strings>
+       <string id="timerContinuesOnAppClose">Timer continues when exiting app</string>
+    </strings>
+
+    <settings>
+        <setting propertyKey="@Properties.timerContinuesOnAppClose" title="@Strings.timerContinuesOnAppClose">
+            <settingConfig type="boolean" />
+        </setting>
+    </settings>
+</resources>
