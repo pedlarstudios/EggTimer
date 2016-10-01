@@ -11,10 +11,7 @@ class EggTimerView extends Ui.View {
 	hidden var manager;
 	hidden var masterClockTimer;
 	hidden var masterClockTimerStarted = false;
-	hidden var separatorLabel;
-	hidden var playIcon;
-	hidden var pauseIcon;
-	hidden var stopIcon;
+	hidden var separatorLabel;	
 	hidden var logger;
 	hidden var timerDrawable;
 
@@ -26,10 +23,7 @@ class EggTimerView extends Ui.View {
 		Ui.View.initialize();
 		self.manager = manager;
 		self.masterClockTimer = masterClockTimer;
-		separatorLabel = new Rez.Drawables.clockSeparator();
-		playIcon = Ui.loadResource(Rez.Drawables.PlayIcon);
-		pauseIcon = Ui.loadResource(Rez.Drawables.PauseIcon);
-		stopIcon = Ui.loadResource(Rez.Drawables.StopIcon);
+		separatorLabel = new Rez.Drawables.clockSeparator();		
 		logger = Log.getLogger("EggTimerView");
 	}
 	
@@ -154,7 +148,7 @@ class EggTimerView extends Ui.View {
 	
 	hidden function buildTimerLabel(text) {
 		return new Ui.Text({
-        	:locX => 102,
+        	:locX => Sys.getDeviceSettings().screenWidth / 2,
         	:locY => 90,
         	:text => text,
         	:color => Gfx.COLOR_WHITE,
@@ -176,19 +170,19 @@ class EggTimerView extends Ui.View {
 			var selectedTimer = manager.getSelectedTimer();
 			var icon;
 			if (selectedTimer.isFinished()) {
-				icon = stopIcon;
+				icon = Rez.Drawables.StopIcon;
 			}
 			else if (selectedTimer.isRunning()) {
-				icon = playIcon;
+				icon = Rez.Drawables.PlayIcon;
 			}
 			else {
-				icon = pauseIcon;
+				icon = Rez.Drawables.PauseIcon;
 			}
 			
-			dc.drawBitmap(185, 9, icon);
+			findDrawableById("statusIcon").setBitmap(icon);			
 		}
 		else {
-			// No icon
+			findDrawableById("statusIcon").setBitmap(Rez.Drawables.StopIcon);
 		}
 	}
 }

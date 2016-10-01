@@ -3,10 +3,10 @@
 
         <iq:products>
             <iq:product id="vivoactive"/>
+            <iq:product id="vivoactive_hr"/>
         </iq:products>
 
-        <iq:permissions>
-        </iq:permissions>
+        <iq:permissions/>
 
         <iq:languages>
             <iq:language>eng</iq:language>

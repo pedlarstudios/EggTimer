@@ -17,7 +17,7 @@ class EggTimerApp extends App.AppBase {
 	}
 
     //! onStart() is called on application start up
-    function onStart() {
+    function onStart(state) {
     	// SET APPROPRIATELY BEFORE DEPLOYMENT/RELEASE
 		var config = new Log4MonkeyC.Config();
 		config.setLogLevel(Log.WARN);
@@ -26,7 +26,7 @@ class EggTimerApp extends App.AppBase {
     }
 
     //! onStop() is called when your application is exiting
-    function onStop() {
+    function onStop(state) {
     	// Nothing
     }
 
@@ -105,13 +105,15 @@ class EggTimerDelegate extends Ui.BehaviorDelegate {
 	//!
 	//! @param evt
 	function onKey(evt) {
+		logger.debug("Key press: " + evt.getKey());
 		if (Ui.KEY_ENTER == evt.getKey()) {			
 			manager.startOrStopSelectedTimer();
-		}
-		else if (Ui.KEY_ESC == evt.getKey()) {
+		} else if (Ui.KEY_ESC == evt.getKey()) {
 			propertyHandler.storeTimers(manager);
 			// Exit application
 			Ui.popView(Ui.SLIDE_IMMEDIATE);
+		} else if (Ui.KEY_UP == evt.getKey() || Ui.KEY_MENU == evt.getKey()) {
+			menuPress();
 		}
 
 		return true;
@@ -119,7 +121,15 @@ class EggTimerDelegate extends Ui.BehaviorDelegate {
 	
 	//! Specifically handles the menu key press
     function onMenu() {
-    	if (manager.getTimerCount() > 0) {
+    	return menuPress();
+	}
+	
+	function onBack() {
+		logger.debug("On back");
+	} 
+	
+	hidden function menuPress() {
+		if (manager.getTimerCount() > 0) {
 			var confirmation = new Ui.Confirmation(Ui.loadResource(Rez.Strings.ClearTimerText));
 			Ui.pushView(confirmation, new ConfirmationDelegateWithCallback(method(:clearSelectedTimer)), Ui.SLIDE_IMMEDIATE);
     	}

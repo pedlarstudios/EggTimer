@@ -184,14 +184,14 @@ class TimerManager {
 		
 		//! Start the timer
 		hidden function start() {			
-			logger.info("Starting timer");
+			logger.debug("Starting timer");
 			backingTimer.start(method(:updateInternalState), TIMER_INCREMENT, true); 
 			_isRunning = true;
 		}
 		
 		//! Stop the timer
 		function stop() {
-			logger.info("Stopping timer");
+			logger.debug("Stopping timer");
 			backingTimer.stop();
 			_isRunning = false;
 		}
@@ -221,7 +221,7 @@ class TimerManager {
 			timeElapsed += TIMER_INCREMENT;
 			timeRemaining -= TIMER_INCREMENT; 
 			
-			logger.info("Time elapsed: " + timeElapsed + "ms, Time remaining: " + timeRemaining + "ms");
+			logger.debug("Time elapsed: " + timeElapsed + "ms, Time remaining: " + timeRemaining + "ms");
 			finishIfNecessary();
 		}
 		
