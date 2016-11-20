@@ -122,6 +122,13 @@ class TimerManager {
 		return newTimer;
 	}
 	
+	function dereference() {
+		self.timerStartedCallback = null;
+		self.timerStoppedCallback = null;
+		self.timerFinishedCallback = null;
+		self.clearTimers();
+	}
+	
 	//! Simple class representing a timer
 	class EggTimer {		
 		hidden const TIMER_INCREMENT = 250;	// ms

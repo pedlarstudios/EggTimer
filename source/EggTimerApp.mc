@@ -11,9 +11,13 @@ class EggTimerApp extends App.AppBase {
 	// Using global clock timer to get around Connect IQ issue where "too many timers" exception may be raised incorrectly
 	hidden var masterClockTimer;
 	
+	hidden var manager;
+	hidden var view;
+	hidden var propertyHandler;
+	
 	//! Init the app
 	function initialize() {
-		App.AppBase.initialize();
+		App.AppBase.initialize();		
 	}
 
     //! onStart() is called on application start up
@@ -23,19 +27,20 @@ class EggTimerApp extends App.AppBase {
 		config.setLogLevel(Log.WARN);
 		Log4MonkeyC.setLogConfig(config);
 		masterClockTimer = new Timer.Timer();
+		manager = new TimerManager(method(:timerStarted), method(:timerStopped), method(:timerFinished));
+    	view = new EggTimerView(manager, masterClockTimer);
+    	propertyHandler = new PropertyHandler();
+    	propertyHandler.loadPreviousTimers(manager);
     }
 
     //! onStop() is called when your application is exiting
     function onStop(state) {
-    	// Nothing
+    	propertyHandler.storeTimers(manager);
+    	manager.dereference();
     }
 
     //! Return the initial view of your application here
-    function getInitialView() {
-    	var manager = new TimerManager(method(:timerStarted), method(:timerStopped), method(:timerFinished));
-    	var view = new EggTimerView(manager, masterClockTimer);
-    	var propertyHandler = new PropertyHandler();
-    	propertyHandler.loadPreviousTimers(manager);
+    function getInitialView() {    	
         return [ view, new EggTimerDelegate(manager, propertyHandler, masterClockTimer) ];
     }
     
@@ -43,7 +48,7 @@ class EggTimerApp extends App.AppBase {
 	//!
 	//! @param [EggTimer] timer that started
     function timerStarted(timer) {
-   		if (Sys.getDeviceSettings().vibrateOn) {			
+   		if (Sys.getDeviceSettings().vibrateOn) {
 			Attn.vibrate([ new Attn.VibeProfile(VIBRATE_DUTY_CYCLE, 250) ]);
 		}
 		
@@ -108,8 +113,7 @@ class EggTimerDelegate extends Ui.BehaviorDelegate {
 		logger.debug("Key press: " + evt.getKey());
 		if (Ui.KEY_ENTER == evt.getKey()) {			
 			manager.startOrStopSelectedTimer();
-		} else if (Ui.KEY_ESC == evt.getKey()) {
-			propertyHandler.storeTimers(manager);
+		} else if (Ui.KEY_ESC == evt.getKey()) {			
 			// Exit application
 			Ui.popView(Ui.SLIDE_IMMEDIATE);
 		} else if (Ui.KEY_UP == evt.getKey() || Ui.KEY_MENU == evt.getKey()) {
