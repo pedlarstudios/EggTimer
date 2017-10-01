@@ -143,13 +143,17 @@ class EggTimerDelegate extends Ui.BehaviorDelegate {
         return true;
 	}
 	
-	//! Clear the selected timer and show the timer duration picker
+	//! Clear the selected timer and show the timer duration picker after confirmation
 	function clearSelectedTimer() {
 		manager.clearSelectedTimer();
-		showTimerDurationPicker();
+		// On some devices (at least in the simulator), the confirmation view whose delegate 
+		// calls this method does not close properly when the duration picker is pushed onto the stack.
+		// This delay seems to resolve the issue
+		var pickerTimer = new Timer.Timer();
+		pickerTimer.start(method(:showTimerDurationPicker), 100, false);
 	}
 	
-	hidden function showTimerDurationPicker() {
+	function showTimerDurationPicker() {
 		var defaultDuration = propertyHandler.getLastTimerDuration();
 		Ui.pushView(new Ui.NumberPicker(Ui.NUMBER_PICKER_TIME, defaultDuration), new NewTimerPickerDelegate(manager, propertyHandler), Ui.SLIDE_IMMEDIATE);
 	}

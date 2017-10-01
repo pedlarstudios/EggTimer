@@ -61,10 +61,7 @@ class EggTimerView extends Ui.View {
         else {
         	showHelpText();
         }
-        separatorLabel.draw(dc);
-        if (timerDrawable != null) {
-        	timerDrawable.draw(dc);
-        }
+        separatorLabel.draw(dc);       
         
         updateTimerStatusIcon(dc); 
     }
@@ -89,18 +86,17 @@ class EggTimerView extends Ui.View {
     
     hidden function updateTimersUi() {
      	if (manager.getTimerCount() > 0) {
-        	// TODO - Eventually support multiple timers
         	var timer = manager.getSelectedTimer();
         	var timeRemainingText = getTimeRemainingFormatted(timer.getTimeRemaining() / 1000);
-        	
         	if (timerDrawable == null) {
-	    		timerDrawable = buildTimerLabel(timeRemainingText);
-        	}
-        	else {
-        		timerDrawable.setText(timeRemainingText);
-        	}
+        		timerDrawable = findDrawableById("timerText");
+        	}        	        
+        	timerDrawable.setText(timeRemainingText);        	
     	}
     	else {
+    		if (timerDrawable != null) {
+    			timerDrawable.setText("");
+    		}
     		timerDrawable = null;
     	}
     }
@@ -144,17 +140,6 @@ class EggTimerView extends Ui.View {
 		}
 		
 		return timeRemainingText;
-	}
-	
-	hidden function buildTimerLabel(text) {
-		return new Ui.Text({
-        	:locX => Sys.getDeviceSettings().screenWidth / 2,
-        	:locY => 90,
-        	:text => text,
-        	:color => Gfx.COLOR_WHITE,
-        	:font => Gfx.FONT_NUMBER_THAI_HOT,
-        	:justification => Gfx.TEXT_JUSTIFY_CENTER | Gfx.TEXT_JUSTIFY_VCENTER
-    	});
 	}
 
 	hidden function hideHelpText() {

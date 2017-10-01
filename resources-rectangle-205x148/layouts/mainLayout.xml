@@ -2,5 +2,6 @@
 	<label id="currentTimeLabel" text="@Strings.DefaultCurrentTimeLabel" color="Gfx.COLOR_WHITE" x="25" y="3" font="Gfx.FONT_MEDIUM" justification="Gfx.TEXT_JUSTIFY_LEFT" />
     <bitmap id="clock_16x16" x="5" y="9" filename="../images/clock16x16.png" />
     <bitmap id="statusIcon" x="185" y="9" filename="../images/stop16x16.png" />
+    <label id="timerText" text="" x="center" y="90" font="Gfx.FONT_NUMBER_THAI_HOT" justification="Gfx.TEXT_JUSTIFY_CENTER | Gfx.TEXT_JUSTIFY_VCENTER" />
     <label id="timerHelp" text="" color="Gfx.COLOR_WHITE" x="center" y="40" font="Gfx.FONT_MEDIUM" justification="Gfx.TEXT_JUSTIFY_CENTER" />    
 </layout>
