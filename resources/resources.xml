@@ -4,7 +4,7 @@
     <bitmap id="StopIcon" filename="images/stop16x16.png" />
     <bitmap id="LauncherIcon" filename="images/egg-logo40x33.png" />
     <string id="AppName">Timer</string>
-    <string id="HelpLabelText">Press Menu button\n to start new timer</string>
+    <string id="HelpLabelText">Press Menu button\nto start new timer</string>
     <string id="ClearTimerText">Start new timer?</string>
     <string id="DefaultCurrentTimeLabel">--:--</string>
 </resources>
