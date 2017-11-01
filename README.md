@@ -15,6 +15,8 @@ Application features include:
 
 ### Version History
 
+1.21 - Add French support (Thanks hobbe!)
+
 1.2 - Additional device support (all currently supported watches) 
 
 1.1.1 - Fix where previous timer wouldn't be remembered upon re-opening the app on newer firmware versions
