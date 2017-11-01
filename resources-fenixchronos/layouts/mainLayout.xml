@@ -3,5 +3,5 @@
     <bitmap id="clock_16x16" x="25" y="38" filename="../images/clock16x16.png" />
     <bitmap id="statusIcon" x="center" y="15" filename="../images/stop16x16.png" />
     <label id="timerText" text="" x="center" y="120" font="Gfx.FONT_NUMBER_THAI_HOT" justification="Gfx.TEXT_JUSTIFY_CENTER | Gfx.TEXT_JUSTIFY_VCENTER" />
-    <label id="timerHelp" text="" color="Gfx.COLOR_WHITE" x="center" y="90" font="Gfx.FONT_MEDIUM" justification="Gfx.TEXT_JUSTIFY_CENTER" />
+    <label id="timerHelp" text="" color="Gfx.COLOR_WHITE" x="center" y="70" font="Gfx.FONT_MEDIUM" justification="Gfx.TEXT_JUSTIFY_CENTER" />
 </layout>

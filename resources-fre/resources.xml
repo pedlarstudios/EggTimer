@@ -1,4 +1,5 @@
 <resources>
     <string id="HelpLabelText">Appuyer sur Menu\npour nouveau\ncompte à rebours</string>
     <string id="ClearTimerText">Nouveau ?</string>
+    <string id="DefaultCurrentTimeLabel">--:--</string>        
 </resources>
