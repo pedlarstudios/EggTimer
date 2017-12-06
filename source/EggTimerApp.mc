@@ -129,7 +129,8 @@ class EggTimerDelegate extends Ui.BehaviorDelegate {
 	}
 	
 	function onBack() {
-		logger.debug("On back");
+		// Exit application
+		Ui.popView(Ui.SLIDE_IMMEDIATE);
 	} 
 	
 	hidden function menuPress() {
