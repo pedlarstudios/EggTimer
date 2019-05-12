@@ -1,6 +1,6 @@
 # EggTimer
 
-Introducing Egg Timer, a simple countdown timer app for the Garmin Connect IQ watches. The application displays a user-entered countdown timer and the current time.
+Introducing Egg Timer, a simple countdown timer app for Garmin Connect IQ watches. The application displays a user-entered countdown timer and the current time.
 
 Application features include:
 
@@ -14,6 +14,12 @@ Application features include:
 -   When the application is relaunched and the timer had previously elapsed, the timer is set to the previously entered duration
 
 ### Version History
+
+1.24 - Update app icon to match app store clock icon. Build with latest Connect IQ. Additional device support.
+
+1.23 - Resolve an issue with properly exiting the app on Vivoactive 3
+
+1.22 - Additional French text update
 
 1.21 - Add French support (Thanks hobbe!)
 
