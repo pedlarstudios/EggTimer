@@ -1,0 +1,10 @@
+<resources>
+    <bitmap id="PlayIcon" filename="images/play16x16.png" />
+    <bitmap id="PauseIcon" filename="images/pause16x16.png" />
+    <bitmap id="StopIcon" filename="images/stop16x16.png" />
+    <bitmap id="LauncherIcon" filename="images/clock33x33.png" />
+    <string id="AppName">Timer</string>
+    <string id="HelpLabelText">Press and hold\nto start new timer</string>
+    <string id="ClearTimerText">Start new timer?</string>
+    <string id="DefaultCurrentTimeLabel">--:--</string>
+</resources>
