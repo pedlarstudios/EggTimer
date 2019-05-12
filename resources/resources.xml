@@ -7,4 +7,5 @@
     <string id="HelpLabelText">Press Menu button\nto start new timer</string>
     <string id="ClearTimerText">Start new timer?</string>
     <string id="DefaultCurrentTimeLabel">--:--</string>
+    <string id="timerContinuesOnAppClose">Timer continues when exiting app</string>    
 </resources>

@@ -13,7 +13,7 @@ module Log4MonkeyC {
 	const LOG_LEVEL_KEY = "logLevel";
 	const DATE_FORMAT_KEY = "dateFormat";
 	
-	hidden var config;
+	var config;
 	
 	//! Build a new [Logger]
 	//!
@@ -76,7 +76,7 @@ module Log4MonkeyC {
 		function setLogLevel(logLevel) {
 			if (!AVAILABLE_LOG_LEVELS.hasKey(logLevel)) {
 				Sys.println("Provided logLevel '" + logLevel + "' is invalid. Please use one of the following levels: ALL, DEBUG, INFO, WARN, ERROR, FATAL, or NONE");
-				return; 
+				return self; 
 			}
 			
 			self.logLevel = logLevel;
@@ -94,7 +94,7 @@ module Log4MonkeyC {
 		function setDateFormat(dateFormat) {
 			if (!AVAILABLE_DATE_FORMATS.hasKey(dateFormat)) {
 				Sys.println("Provided dateFormat '" + dateFormat + "' is invalid. Please use one of the following formats: 0 (FORMAT_SHORT), 1 (FORMAT_MEDIUM), or 2 (FORMAT_LONG)");
-				return;
+				return self;
 			}
 			
 			self.dateFormat = dateFormat;

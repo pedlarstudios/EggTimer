@@ -1,6 +1,7 @@
 using Toybox.Application as App;
 using Toybox.Attention as Attn;
 using Toybox.Time as Time;
+using Toybox.Timer as Timer;
 using Toybox.System as Sys;
 using Toybox.WatchUi as Ui;
 using Log4MonkeyC as Log;
