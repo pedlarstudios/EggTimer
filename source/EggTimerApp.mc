@@ -78,7 +78,7 @@ class EggTimerApp extends App.AppBase {
 	//! @param [EggTimer] timer that finished
     function timerFinished(timer) {
     	if (Sys.getDeviceSettings().vibrateOn) {
-			Attn.vibrate([ new Attn.VibeProfile(VIBRATE_DUTY_CYCLE, 1000), new Attn.VibeProfile(VIBRATE_DUTY_CYCLE, 1000) ]);
+			Attn.vibrate([ new Attn.VibeProfile(VIBRATE_DUTY_CYCLE, 1000) ]);
 		}
 
 		if (Attn has :playTone && Sys.getDeviceSettings().tonesOn) {
