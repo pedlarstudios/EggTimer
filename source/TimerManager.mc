@@ -6,7 +6,7 @@ using Toybox.Timer as Timer;
 //! Class responsible for creating and starting/stopping [EggTimer]s
 class TimerManager {
 	static const MAX_MANAGED_TIMER_COUNT = 1;
-	
+
 	hidden var timerStartedCallback;
 	hidden var timerStoppedCallback;
 	hidden var timerFinishedCallback;
@@ -26,7 +26,7 @@ class TimerManager {
 		self.timerFinishedCallback = timerFinishedCallback;
 		logger = Log.getLogger("TimerManager");
 	}
-	
+
 	//! @return [Boolean] True if a timer can be added
 	function canAddTimer() {
 		return timerCount < MAX_MANAGED_TIMER_COUNT;
@@ -39,7 +39,7 @@ class TimerManager {
 	function addExistingTimerStopped(duration, elapsedTime) {
 		addTimerHidden(duration, elapsedTime, false);
 	}
-	
+
 	//! Add a timer, selecting it in the process
 	//!
 	//! @param [Number] duration, in ms
@@ -48,29 +48,29 @@ class TimerManager {
 	function addExistingTimer(duration, elapsedTime, startAutomatically) {
 		addTimerHidden(duration, elapsedTime, startAutomatically);
 	}
-	
+
 	//! Add a new timer, selecting it in the process, and starting it automatically
 	//!
 	//! @param [Number] duration, in ms
 	function addNewTimer(duration) {
 		addTimerHidden(duration, 0, true);
 	}
-	
+
 	//! @return [Number] The number of timers
 	function getTimerCount() {
 		return timerCount;
 	}
-	    
+
     //! @return [Array] of [EggTimer]s, of size MAX_MANAGED_TIMER_COUNT (may have null items)
     function getTimers() {
         return timers;
     }
-	
+
 	//! @return Selected [EggTimer], or null if there are no timers
 	function getSelectedTimer() {
 		return selectedTimer;
 	}
-	
+
 	//! Clear the selected timer
 	function clearSelectedTimer() {
 		if (selectedTimer != null) {
@@ -80,7 +80,7 @@ class TimerManager {
 		// TODO - handle multiple timers
 		clearTimers();
 	}
-	
+
 	//! Clear managed timers
 	function clearTimers() {
 		// TODO - handle multiple timers
@@ -88,14 +88,14 @@ class TimerManager {
 		timers = new [ MAX_MANAGED_TIMER_COUNT ];
 		timerCount = 0;
 	}
-	
+
 	//! Select the current timer that will have action taken on it
-	//! 
+	//!
 	//! @param [EggTimer] timer to select
 	function selectTimer(timer) {
 		selectedTimer = timer;
 	}
-	
+
 	//! Start or stop the selected timer, if one is present, and not finished
 	function startOrStopSelectedTimer() {
 		if (selectedTimer != null) {
@@ -107,32 +107,32 @@ class TimerManager {
 			}
 		}
 	}
-	
+
 	hidden function addTimerHidden(duration, elapsedTime, startAutomatically) {
 		if (timerCount >= MAX_MANAGED_TIMER_COUNT) {
 			logger.error("Cannot add timer, max timer count of " + MAX_MANAGED_TIMER_COUNT + " would be exceeded");
 			return null;
 		}
-		
-		logger.debug("Adding timer with duration: " + duration + "ms, elapsed time: " + elapsedTime + "ms");		
+
+		logger.debug("Adding timer with duration: " + duration + "ms, elapsed time: " + elapsedTime + "ms");
 		var newTimer = new EggTimer(duration, elapsedTime, timerCount + 1, startAutomatically, timerFinishedCallback);
 		timers[timerCount] = newTimer;
 		timerCount++;
 		selectTimer(newTimer);
 		return newTimer;
 	}
-	
+
 	function dereference() {
 		self.timerStartedCallback = null;
 		self.timerStoppedCallback = null;
 		self.timerFinishedCallback = null;
 		self.clearTimers();
 	}
-	
+
 	//! Simple class representing a timer
-	class EggTimer {		
+	class EggTimer {
 		hidden const TIMER_INCREMENT = 250;	// ms
-	
+
 		hidden var backingTimer;
 		hidden var duration;
 		hidden var timeElapsed;
@@ -141,12 +141,12 @@ class TimerManager {
 		hidden var logger;
 		hidden var timerFinishedCallback;
 		hidden var _isRunning = false;	// Monkey C does not presently allow variable names and method names to be the same, hence the underscore
-		hidden var _isFinished;				
-	
+		hidden var _isFinished;
+
 		//! Creates an EggTimer instance
 		//!
 		//! @param [Number] duration Duration of the timer, in ms
-		//!	@param [Number] timeElapsed Time elapsed, in ms 
+		//!	@param [Number] timeElapsed Time elapsed, in ms
 		//! @param [String] label describing the timer
 		//! @param [Boolean] true if the timer should start counting down automatically after initialized
 		//! @param [Method] timerFinishedCallback Method to call when the timer finishes (time remaining = 0)
@@ -155,69 +155,69 @@ class TimerManager {
 			self.timeElapsed = timeElapsed;
 			self.label = label;
 			self.timerFinishedCallback = timerFinishedCallback;
-			
+
 			timeRemaining = duration - timeElapsed;
 			_isFinished = timeRemaining <= 0;
 			backingTimer = new Timer.Timer();
 			logger = Log.getLogger("Timer " + label);
-			
+
 			if (startAutomatically) {
 				start();
 			}
 		}
-		
+
 		//! @return [Boolean] True if the timer is currently running
 		function isRunning() {
-			return _isRunning;	
+			return _isRunning;
 		}
-		
+
 		//! @return [Boolean] True if the timer is currently finished (time remaining = 0)
 		function isFinished() {
 			return _isFinished;
-		}		
-		
+		}
+
 		//! Stop the timer if it's running, start it if it's not
 		//!
 		//! @return [Boolean] True if the timer is running
 		function startOrStop() {
 			if (isRunning()) {
 				return stop();
-			}			
+			}
 			if (isFinished()) {
 				prepareForRestart();
 			}
-			return start();			
+			return start();
 		}
-		
+
 		//! Start the timer
-		hidden function start() {			
+		hidden function start() {
 			logger.debug("Starting timer");
-			backingTimer.start(method(:updateInternalState), TIMER_INCREMENT, true); 
+			backingTimer.start(method(:updateInternalState), TIMER_INCREMENT, true);
 			_isRunning = true;
 		}
-		
+
 		//! Stop the timer
 		function stop() {
 			logger.debug("Stopping timer");
 			backingTimer.stop();
 			_isRunning = false;
 		}
-		
+
 		//! @return [Number] Time remaining, in ms
 		function getTimeRemaining() {
 			return timeRemaining;
 		}
-		
+
 		//! @return [Number] Time elapsed, in ms
 		function getTimeElapsed() {
 			return timeElapsed;
 		}
-		
+
 		//! @return [Number] Timer duration, in ms
 		function getDuration() {
 			return duration;
 		}
-		
+
 		//! Update internal state every second
 		//!
 		//! This function would ideally be hidden but that would prevent it from being used as a timer callback in Monkey C
@@ -226,26 +226,26 @@ class TimerManager {
 				return;
 			}
 			timeElapsed += TIMER_INCREMENT;
-			timeRemaining -= TIMER_INCREMENT; 
-			
+			timeRemaining -= TIMER_INCREMENT;
+
 			logger.debug("Time elapsed: " + timeElapsed + "ms, Time remaining: " + timeRemaining + "ms");
 			finishIfNecessary();
 		}
-		
+
 		hidden function finishIfNecessary() {
 			if (timeRemaining <= 0) {
-				stop();				
+				stop();
 				_isFinished = true;
 				timerFinishedCallback.invoke(self);
 				return true;
 			}
 			return false;
 		}
-		
+
 		hidden function prepareForRestart() {
 			timeElapsed = 0;
 			timeRemaining = duration - timeElapsed;
-			_isFinished = false;			
+			_isFinished = false;
 		}
 	}
 }

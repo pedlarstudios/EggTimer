@@ -11,14 +11,14 @@ class EggTimerApp extends App.AppBase {
 	hidden const VIBRATE_DUTY_CYCLE = 100; // Max vibration frequency/strength
 	// Using global clock timer to get around Connect IQ issue where "too many timers" exception may be raised incorrectly
 	hidden var masterClockTimer;
-	
+
 	hidden var manager;
 	hidden var view;
 	hidden var propertyHandler;
-	
+
 	//! Init the app
 	function initialize() {
-		App.AppBase.initialize();		
+		App.AppBase.initialize();
 	}
 
     //! onStart() is called on application start up
@@ -41,10 +41,10 @@ class EggTimerApp extends App.AppBase {
     }
 
     //! Return the initial view of your application here
-    function getInitialView() {    	
+    function getInitialView() {
         return [ view, new EggTimerDelegate(manager, propertyHandler, masterClockTimer) ];
     }
-    
+
     //! Handle when a timer is started in the application
 	//!
 	//! @param [EggTimer] timer that started
@@ -52,42 +52,42 @@ class EggTimerApp extends App.AppBase {
    		if (Sys.getDeviceSettings().vibrateOn) {
 			Attn.vibrate([ new Attn.VibeProfile(VIBRATE_DUTY_CYCLE, 250) ]);
 		}
-		
+
 		// Not actually applicable on Vivoactive, just adding in case of additional device support
 		if (Attn has :playTone && Sys.getDeviceSettings().tonesOn) {
 			Attn.playTone(Attn.TONE_START);
-		}		
+		}
     }
-    
+
     //! Handle when a timer is stopped in the application
 	//!
 	//! @param [EggTimer] timer that stopped
     function timerStopped(timer) {
-    	if (Sys.getDeviceSettings().vibrateOn) {			
+    	if (Sys.getDeviceSettings().vibrateOn) {
 			Attn.vibrate([ new Attn.VibeProfile(VIBRATE_DUTY_CYCLE, 500) ]);
 		}
-		
+
 		// Not actually applicable on Vivoactive, just adding in case of additional device support
 		if (Attn has :playTone && Sys.getDeviceSettings().tonesOn) {
 			Attn.playTone(Attn.TONE_STOP);
 		}
     }
-    
+
     //! Handle when a timer is finished in the application
 	//!
 	//! @param [EggTimer] timer that finished
     function timerFinished(timer) {
-    	if (Sys.getDeviceSettings().vibrateOn) {			
-			Attn.vibrate([ new Attn.VibeProfile(VIBRATE_DUTY_CYCLE, 1000), new Attn.VibeProfile(VIBRATE_DUTY_CYCLE, 1000), new Attn.VibeProfile(VIBRATE_DUTY_CYCLE, 1000), new Attn.VibeProfile(VIBRATE_DUTY_CYCLE, 1000), new Attn.VibeProfile(VIBRATE_DUTY_CYCLE, 1000) ]);
+    	if (Sys.getDeviceSettings().vibrateOn) {
+			Attn.vibrate([ new Attn.VibeProfile(VIBRATE_DUTY_CYCLE, 1000), new Attn.VibeProfile(VIBRATE_DUTY_CYCLE, 1000) ]);
 		}
-		
+
 		if (Attn has :playTone && Sys.getDeviceSettings().tonesOn) {
 			Attn.playTone(Attn.TONE_ALARM);
 		}
     }
 }
 
-//! Handles user interaction with the timers 
+//! Handles user interaction with the timers
 class EggTimerDelegate extends Ui.BehaviorDelegate {
 	hidden var manager;
 	hidden var propertyHandler;
@@ -112,9 +112,9 @@ class EggTimerDelegate extends Ui.BehaviorDelegate {
 	//! @param evt
 	function onKey(evt) {
 		logger.debug("Key press: " + evt.getKey());
-		if (Ui.KEY_ENTER == evt.getKey()) {			
+		if (Ui.KEY_ENTER == evt.getKey()) {
 			manager.startOrStopSelectedTimer();
-		} else if (Ui.KEY_ESC == evt.getKey()) {			
+		} else if (Ui.KEY_ESC == evt.getKey()) {
 			// Exit application
 			Ui.popView(Ui.SLIDE_IMMEDIATE);
 		} else if (Ui.KEY_UP == evt.getKey() || Ui.KEY_MENU == evt.getKey()) {
@@ -123,38 +123,38 @@ class EggTimerDelegate extends Ui.BehaviorDelegate {
 
 		return true;
 	}
-	
+
 	//! Specifically handles the menu key press
     function onMenu() {
     	return menuPress();
 	}
-	
+
 	function onBack() {
 		// Exit application
 		Ui.popView(Ui.SLIDE_IMMEDIATE);
-	} 
-	
+	}
+
 	hidden function menuPress() {
 		if (manager.getTimerCount() > 0) {
 			var confirmation = new Ui.Confirmation(Ui.loadResource(Rez.Strings.ClearTimerText));
 			Ui.pushView(confirmation, new ConfirmationDelegateWithCallback(method(:clearSelectedTimer)), Ui.SLIDE_IMMEDIATE);
     	}
-		else if (manager.canAddTimer()) {			
+		else if (manager.canAddTimer()) {
 			showTimerDurationPicker();
     	}
         return true;
 	}
-	
+
 	//! Clear the selected timer and show the timer duration picker after confirmation
 	function clearSelectedTimer() {
 		manager.clearSelectedTimer();
-		// On some devices (at least in the simulator), the confirmation view whose delegate 
+		// On some devices (at least in the simulator), the confirmation view whose delegate
 		// calls this method does not close properly when the duration picker is pushed onto the stack.
 		// This delay seems to resolve the issue
 		var pickerTimer = new Timer.Timer();
 		pickerTimer.start(method(:showTimerDurationPicker), 100, false);
 	}
-	
+
 	function showTimerDurationPicker() {
 		var defaultDuration = propertyHandler.getLastTimerDuration();
 		Ui.pushView(new Ui.NumberPicker(Ui.NUMBER_PICKER_TIME, defaultDuration), new NewTimerPickerDelegate(manager, propertyHandler), Ui.SLIDE_IMMEDIATE);
@@ -172,7 +172,7 @@ class ConfirmationDelegateWithCallback extends Ui.ConfirmationDelegate {
 		Ui.ConfirmationDelegate.initialize();
 		self.callbackMethod = callbackMethod;
 	}
-	
+
 	//! When a response is chosen, onResponse() is called, passing the response of CONFIRM_NO or CONFIRM_YES.
 	//!
 	//! @param [Object] response
@@ -180,7 +180,7 @@ class ConfirmationDelegateWithCallback extends Ui.ConfirmationDelegate {
 		if (response == Ui.CONFIRM_YES) {
 			callbackMethod.invoke();
 		}
-		
+
 		return true;
 	}
 }
@@ -201,7 +201,7 @@ class NewTimerPickerDelegate extends Ui.NumberPickerDelegate {
 	}
 
 	//! Handle when the number is picked
-	//! 
+	//!
 	//! @param [Duration] value picked
 	function onNumberPicked(value) {
 		manager.addNewTimer(value.value() * 1000);
