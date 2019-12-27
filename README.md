@@ -15,29 +15,31 @@ Application features include:
 
 ### Version History
 
-1.24 - Update app icon to match app store clock icon. Build with latest Connect IQ. Additional device support.
+1.25.0 - Reduce vibration when timer finishes
 
-1.23 - Resolve an issue with properly exiting the app on Vivoactive 3
+1.24   - Update app icon to match app store clock icon. Build with latest Connect IQ. Additional device support.
 
-1.22 - Additional French text update
+1.23   - Resolve an issue with properly exiting the app on Vivoactive 3
 
-1.21 - Add French support (Thanks hobbe!)
+1.22   - Additional French text update
 
-1.2 - Additional device support (all currently supported watches) 
+1.21   - Add French support (Thanks hobbe!)
 
-1.1.1 - Fix where previous timer wouldn't be remembered upon re-opening the app on newer firmware versions
+1.2    - Additional device support (all currently supported watches) 
 
-1.1 - Add Vivoactive HR support
+1.1.1  - Fix where previous timer wouldn't be remembered upon re-opening the app on newer firmware versions
 
-1.0.1 - Add user setting that allows a running timer to continue to countdown while the app is not open
+1.1    - Add Vivoactive HR support
 
-0.7 - Restart timer with Action button after time elapses
+1.0.1  - Add user setting that allows a running timer to continue to countdown while the app is not open
 
-0.6.1 - Improved battery life significantly by reducing UI refresh rate of timer
+0.7    - Restart timer with Action button after time elapses
 
-0.6 - Increased vibration strength, add status icon (play/pause/stop)
+0.6.1  - Improved battery life significantly by reducing UI refresh rate of timer
 
-0.5 - Initial public version
+0.6    - Increased vibration strength, add status icon (play/pause/stop)
+
+0.5    - Initial public version
 
 ### Technical Information
 
