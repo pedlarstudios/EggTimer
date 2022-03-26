@@ -156,8 +156,20 @@ class EggTimerDelegate extends Ui.BehaviorDelegate {
 	}
 
 	function showTimerDurationPicker() {
+
 		var defaultDuration = propertyHandler.getLastTimerDuration();
-		Ui.pushView(new Ui.NumberPicker(Ui.NUMBER_PICKER_TIME, defaultDuration), new NewTimerPickerDelegate(manager, propertyHandler), Ui.SLIDE_IMMEDIATE);
+		Sys.println("Duration: " + defaultDuration.value());
+
+		//Ui.pushView(new Ui.NumberPicker(Ui.NUMBER_PICKER_TIME, defaultDuration), new NewTimerPickerDelegate(manager, propertyHandler), Ui.SLIDE_IMMEDIATE);
+		//return;
+
+		// NumberPicker deprecated in Connect IQ 3.0
+		var timePicker = new TimePicker(defaultDuration);
+		Sys.println(timePicker);
+		var timePickerDelegate = new TimePickerDelegate(manager, propertyHandler);
+		Sys.println(timePickerDelegate);
+		Ui.pushView(timePicker, timePickerDelegate, WatchUi.SLIDE_IMMEDIATE);
+		//Ui.pushView(new Ui.NumberPicker(Ui.NUMBER_PICKER_TIME, defaultDuration), new NewTimerPickerDelegate(manager, propertyHandler), Ui.SLIDE_IMMEDIATE);
 	}
 }
 
